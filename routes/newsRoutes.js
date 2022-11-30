@@ -1,10 +1,8 @@
 const express = require("express");
 
 const router = express();
-const { validationResult } = require("express-validator");
+const { body, validationResult } = require("express-validator");
 const NewsModel = require("../models/newsSchema");
-
-const { body } = require("express-validator");
 
 router
   .post("/load", async (req, res) => {
