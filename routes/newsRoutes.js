@@ -38,9 +38,25 @@ router
     }
   })
 
-  .get("/vernoticias", async (req, res) => {
+  .get("/newslist", async (req, res) => {
     const noticias = await NewsModel.find();
     res.send(noticias);
+  })
+  .put("/editnews/:id", async (req, res) => {
+    const noticiaEditada = await NewsModel.findOneAndUpdate(
+      { _id: req.params.id },
+      { title: req.body.title },
+      { new: true }
+    );
+    res.send(noticiaEditada);
+  })
+  .delete("/deletenews/:id", async (req, res) => {
+    try {
+      await NewsModel.findOneAndDelete({ _id: req.params.id });
+      res.send("Noticia Eliminada");
+    } catch (error) {
+      console.log("error", error);
+    }
   });
 
 module.exports = router;
