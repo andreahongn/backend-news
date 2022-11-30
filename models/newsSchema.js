@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 
 const newsSchema = new mongoose.Schema({
-  title: String,
-  category: String,
+  title: { type: String, required: true, min: 5 },
+  category: { type: String, required: true, min: 3, max: 20 },
   description: String,
-  content: String,
-  img_URL: String,
+  content: { type: String, required: true },
+  img_URL: { type: String, required: true },
   date: String,
   author: String,
-  highlight: false,
+  highlight: Boolean,
 });
 const NewsModel = mongoose.model("news", newsSchema);
 
