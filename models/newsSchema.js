@@ -8,7 +8,7 @@ const newsSchema = new mongoose.Schema({
   img_URL: { type: String, required: true },
   date: String,
   author: String,
-  highlight: Boolean,
+  highlight: { type: Boolean, default: false },
 });
 const NewsModel = mongoose.model("news", newsSchema);
 
