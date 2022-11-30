@@ -50,10 +50,11 @@ app.listen(3001, () => {
 //   async (req, res) => {}
 // );
 
-// app.get("/verusuarios", async (req, res) => {
-//   const usuarios = await UserModel.find();
-//   res.send(usuarios);
-// });
+app.get("/verusuarios", async (req, res) => {
+  // const usuarios = await UserModel.find();
+  // res.send(usuarios);
+  res.status(200).json({ test: true });
+});
 
 // app.get("/verusuario/:id", async (req, res) => {
 //   const idParams = req.params.id;
