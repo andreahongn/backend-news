@@ -36,12 +36,12 @@ router
     }
   })
 
-  .get("/newslist", async (req, res) => {
+  .get("/news", async (req, res) => {
     const allnews = await NewsModel.find();
     res.send(allnews);
   })
 
-  .get("/newslist/:id", async (req, res) => {
+  .get("/news/:id", async (req, res) => {
     const { id } = req.params;
     console.log("GET /news/" + id);
     try {
