@@ -37,17 +37,17 @@ router
   })
 
   .get("/news", async (req, res) => {
-    const allnews = await NewsModel.find();
-    res.send(allnews);
+    try {
+      const allnews = await NewsModel.find();
+      res.status(200).send(allnews);
+    } catch (error) {
+      res.status(400).json({ error: true, message: error });
+    }
   })
 
   .get("/news/:id", async (req, res) => {
-    const { id } = req.params;
-    console.log("GET /news/" + id);
     try {
-      const news = await NewsModel.findOne({
-        _id: id,
-      });
+      const news = await NewsModel.findOne({ _id: req.params.id });
       res.status(200).json(news);
     } catch (error) {
       res.status(404).json({
