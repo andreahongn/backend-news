@@ -41,7 +41,7 @@ router
     res.send(allnews);
   })
 
-  .get("/:id", async (req, res) => {
+  .get("/newslist/:id", async (req, res) => {
     const { id } = req.params;
     console.log("GET /news/" + id);
     try {
@@ -56,6 +56,7 @@ router
       });
     }
   })
+
   .put("/editnews/:id", async (req, res) => {
     const noticiaEditada = await NewsModel.findOneAndUpdate(
       { _id: req.params.id },
