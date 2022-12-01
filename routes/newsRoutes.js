@@ -37,8 +37,24 @@ router
   })
 
   .get("/newslist", async (req, res) => {
-    const noticias = await NewsModel.find();
-    res.send(noticias);
+    const allnews = await NewsModel.find();
+    res.send(allnews);
+  })
+
+  .get("/:id", async (req, res) => {
+    const { id } = req.params;
+    console.log("GET /news/" + id);
+    try {
+      const news = await NewsModel.findOne({
+        _id: id,
+      });
+      res.status(200).json(news);
+    } catch (error) {
+      res.status(404).json({
+        error: true,
+        message: error,
+      });
+    }
   })
   .put("/editnews/:id", async (req, res) => {
     const noticiaEditada = await NewsModel.findOneAndUpdate(
