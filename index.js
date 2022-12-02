@@ -1,18 +1,7 @@
-// ConmoJS;
-// const variable1 = require("./DataBase");
-
-// console.log(variable1);
-
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
 const cors = require("cors");
-// const routes = require("./routes/userRoutes");
-const routes = require("./routes/newsRoutes");
-
-const { body, validationResult } = require("express-validator");
-// const router = require("./routes/userRoutes");
-const router = require("./routes/newsRoutes");
 
 require("./dataBase");
 // middlewars
@@ -20,22 +9,37 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use(cors());
-app.use("/", routes);
 
-//CRUD
-// app.get
-// app.post
-// app.del
+// ENRUTAMIENTO
+
+// con el index.js adentro de routes
+
+// const routes = require("./routes/index");
+// app.use("/", routes);
+
+// por separado
+
+// const routesN = require("./routes/newsRoutes");
+// app.use("/", routesN);
+// const routesU = require("./routes/userRoutes");
+// app.use("/", routesU);
+
+// dos middlewares activos en simultaneo
+
+// const routesU = require("./routes/userRoutes");
+// const routesN = require("./routes/newsRoutes");
+// app.use("/newsRoutes", routesN);
+// app.use("/userRoutes", routesU);
+
+app.listen(3001, () => {
+  console.log("Server encendido en puerto 3001");
+});
 
 //Routes
 
 // app.use((req, res, next) => {
 //   res.status(404).json({ msg: "Pagina no encontrada" });
 // });
-
-app.listen(3001, () => {
-  console.log("Server encendido en puerto 3001");
-});
 
 // app.post(
 //   "/register",
@@ -50,11 +54,11 @@ app.listen(3001, () => {
 //   async (req, res) => {}
 // );
 
-app.get("/verusuarios", async (req, res) => {
-  // const usuarios = await UserModel.find();
-  // res.send(usuarios);
-  res.status(200).json({ test: true });
-});
+// app.get("/verusuarios", async (req, res) => {
+//   // const usuarios = await UserModel.find();
+//   // res.send(usuarios);
+//   res.status(200).json({ test: true });
+// });
 
 // app.get("/verusuario/:id", async (req, res) => {
 //   const idParams = req.params.id;

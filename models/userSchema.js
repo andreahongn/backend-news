@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     min: 3,
     max: 30,
-    unique: true,
+
     trim: true,
   },
 
@@ -23,7 +23,6 @@ const userSchema = new mongoose.Schema({
     required: true,
     min: 6,
     max: 12,
-    unique: true,
   },
 
   password: {
