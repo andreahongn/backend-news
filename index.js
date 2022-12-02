@@ -12,24 +12,8 @@ app.use(cors());
 
 // ENRUTAMIENTO
 
-// con el index.js adentro de routes
-
-// const routes = require("./routes/index");
-// app.use("/", routes);
-
-// por separado
-
-const routesN = require("./routes/newsRoutes");
-app.use("/", routesN);
-// const routesU = require("./routes/userRoutes");
-// app.use("/", routesU);
-
-// dos middlewares activos en simultaneo
-
-// const routesU = require("./routes/userRoutes");
-// const routesN = require("./routes/newsRoutes");
-// app.use("/newsRoutes", routesN);
-// app.use("/userRoutes", routesU);
+const routes = require("./routes");
+app.use("/", routes);
 
 app.listen(3001, () => {
   console.log("Server encendido en puerto 3001");

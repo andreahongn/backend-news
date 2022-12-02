@@ -14,7 +14,6 @@ const userSchema = new mongoose.Schema({
     required: true,
     min: 3,
     max: 30,
-
     trim: true,
   },
 
@@ -33,6 +32,6 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-const UserModel = mongoose.model("user", userSchema);
+const UserModel = mongoose.model("users", userSchema);
 
 module.exports = UserModel;

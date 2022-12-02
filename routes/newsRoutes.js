@@ -64,7 +64,7 @@ router
         {
           title: body.title,
           category: body.category,
-          description: body.descrption,
+          description: body.description,
           content: body.content,
           author: body.author,
           date: body.date,
