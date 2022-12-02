@@ -1,26 +1,56 @@
-// const express = require("express");
+const router = require("express").Router();
+const createUserController = require("../controllers/userController");
+const { body, validationResult } = require("express-validator");
 
-// const router = express();
-// const createUserController = require("../controllers/userController");
-// const { body } = require("express-validator");
+router
+  .post("/register", async (req, res) => {
+    console.log("POST /users/register");
+    const { body } = req;
+    // Chequeo si el body no llega vacío para directamente devolver
+    if (!body.name || !body.password || !body.mail) {
+      return res.status(400).json({
+        error: true,
+        message: "The message has EMPTY fields.",
+      });
+    }
 
-// router
-//   .post(
-//     "/register",
-//     [
-//       body("user", "Campo usuario es requerido").notEmpty(),
-//       body("user", "Email invalido").isEmail(),
-//       body(
-//         "password",
-//         "Contraseña: mín 8 caracateres y max 25 caracteres"
-//       ).isLength({ min: 8, max: 25 }),
-//     ],
-//     createUserController.crearUsuario
-//   )
+    // Chequeo doble de previa existencia del usuario, en la API y en el Schema con unique
+    const newUserNameExist = await User.findOne({
+      name: body.name,
+    });
+    const newUserMailExist = await User.findOne({
+      email: body.email,
+    });
+    if (newUserNameExist || newUserMailExist) {
+      return res.status(400).json({
+        error: true,
+        message: "User or email already EXISTS",
+      });
+    }
 
-//   .get("/verusuarios", async (req, res) => {
-//     const usuarios = await UserModel.find();
-//     res.send(usuarios);
-//   });
+    // Aplico bcrypt
+    //   const salt = await bcrypt.genSalt();
+    //   const hashedPassword = await bcrypt.hash(body.password, salt);
 
-// module.exports = router;
+    try {
+      const newUser = new User({
+        name: body.name,
+        email: body.email,
+        username: body.mail,
+        password: body.password,
+      });
+      await newUser.save();
+      newUser.password = body.password;
+      res.status(200).json(newUser);
+      console.log("ADD user " + newUser.name);
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ error: true, message: error });
+    }
+  })
+  .get("/verusuarios", async (req, res) => {
+    const usuarios = await UserModel.find();
+    res.send(usuarios);
+  });
+
+module.exports = router;
