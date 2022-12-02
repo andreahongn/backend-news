@@ -45,7 +45,6 @@ router
 
   .get("/news/:id", async (req, res) => {
     try {
-      // const { id } = req.params;
       const news = await NewsModel.findOne({ _id: req.params.id });
       res.status(200).json(news);
     } catch (error) {
