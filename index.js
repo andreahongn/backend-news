@@ -19,8 +19,8 @@ app.use(cors());
 
 // por separado
 
-// const routesN = require("./routes/newsRoutes");
-// app.use("/", routesN);
+const routesN = require("./routes/newsRoutes");
+app.use("/", routesN);
 // const routesU = require("./routes/userRoutes");
 // app.use("/", routesU);
 
