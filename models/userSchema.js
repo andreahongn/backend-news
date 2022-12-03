@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
     min: 8,
     max: 30,
   },
+  tokens: {
+    type: String,
+    default: "",
+  },
 });
 
 const UserModel = mongoose.model("users", userSchema);

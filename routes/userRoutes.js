@@ -2,12 +2,14 @@ const router = require("express").Router();
 const createUserController = require("../controllers/userController");
 const { body, validationResult } = require("express-validator");
 const UserModel = require("../models/userSchema");
+const tokenValidation = require("./tokenValidation");
+const jwt = require("jsonwebtoken");
 
 const bcrypt = require("bcryptjs");
 
 router
   .post("/register", async (req, res) => {
-    console.log("POST /users/register");
+    // console.log("POST /users/register");
     const { body } = req;
     // Chequeo si el body no llega vacío para directamente devolver
     if (!body.name || !body.username || !body.password || !body.email) {
@@ -17,7 +19,6 @@ router
       });
     }
 
-    // Chequeo doble de previa existencia del usuario, en la API y en el Schema con unique
     const newUserNameExist = await UserModel.findOne({
       username: body.username,
     });
@@ -53,9 +54,7 @@ router
 
   .post("/login", async (req, res, next) => {
     const { body } = req;
-    // timeStamp("POST on /users/login");
 
-    // TODO: Add validations
     if (!body.username || !body.password) {
       return res.status(400).json({
         error: true,
@@ -79,39 +78,37 @@ router
     const passwordOk = await bcrypt.compare(body.password, user.password);
 
     if (user && passwordOk) {
-      return res.status(200).json({
+      // creo token
+      const token = jwt.sign(
+        {
+          username: user.username,
+          email: user.email,
+          id: user._id,
+        },
+        process.env.TOKEN_SECRET
+      );
+      console.log("token1:" + token);
+
+      // añado token a usuario
+      const userToAddToken = await UserModel.findOneAndUpdate(
+        { username: body.username },
+        {
+          name: user.name,
+          username: user.username,
+          password: user.password,
+          email: user.email,
+          tokens: token,
+        },
+        {
+          useFindAndModify: false,
+        }
+      );
+
+      return res.header("auth-token", token).status(200).json({
         error: null,
         message: "Credentials are OK",
+        data: { token },
       });
-      // const token = jwt.sign(
-      //   {
-      //     name: user.name,
-      //     role: user.role,
-      //     id: user._id,
-      //   },
-      //   process.env.TOKEN_SECRET
-      // );
-
-      // const userToAddToken = await UserModel.findOneAndUpdate(
-      //   { name: body.name },
-      //   {
-      //     name: user.name,
-      //     username: user.username,
-      //     password: user.password,
-      //     email: user.email,
-      //     tokens: token,
-      //   },
-      //   {
-      //     useFindAndModify: false,
-      //   }
-      // );
-
-      // return res.header("auth-token", token).status(200).json({
-      //   error: null,
-      //   message: "Credentials are OK",
-      //   role: user.role,
-      //   data: { token },
-      // });
     } else {
       return res.status(400).json({
         error: true,
@@ -125,8 +122,20 @@ router
     res.send(usuarios);
   })
 
-  .put("/edituser/:id", async (req, res) => {
+  .put("/edituser/:id", tokenValidation, async (req, res) => {
     const { body } = req;
+    const token = req.header("auth-token");
+    const SUPER_USER = process.env.SUPER_USER || "admin";
+    const decodedToken = jwt.decode(token, { complete: true });
+    if (
+      body.username === SUPER_USER ||
+      !decodedToken.payload.role === "admin"
+    ) {
+      return res.status(400).json({
+        error: true,
+        message: "Acceso DENEGADO.",
+      });
+    }
     try {
       const usuarioEditado = await UserModel.findOneAndUpdate(
         { _id: req.params.id },
@@ -139,7 +148,6 @@ router
         { new: true }
       );
       res.status(200).json(usuarioEditado);
-      res.send(usuarioEditado);
     } catch (error) {
       console.log(error);
       res.status(404).json({
@@ -149,11 +157,25 @@ router
     }
   })
 
-  .delete("/deleteuser/:id", async (req, res) => {
-    try {
-      await UserModel.findOneAndDelete({ _id: req.params.id });
+  .delete("/deleteuser/:id", tokenValidation, async (req, res) => {
+    const token = req.header("auth-token");
+    const decodedToken = jwt.decode(token, { complete: true });
+    const SUPER_USER = process.env.SUPER_USER || "admin";
 
-      res.send("Usuario eliminado");
+    if (
+      body.username === SUPER_USER ||
+      !decodedToken.payload.role === "admin"
+    ) {
+      return res.status(400).json({
+        error: true,
+        message: "Acceso DENEGADO.",
+      });
+    }
+    try {
+      const deletedUser = await UserModel.findOneAndDelete({
+        _id: req.params.id,
+      });
+      res.status(200).json(deletedUser);
     } catch (error) {
       console.log(error);
       res.status(404).json({
