@@ -10,7 +10,7 @@ router
     }
     const {
       title,
-      URL_img,
+      img_URL,
       description,
       date,
       category,
@@ -68,7 +68,7 @@ router
           content: body.content,
           author: body.author,
           date: body.date,
-          URL_img: body.URL_img,
+          img_URL: body.img_URL,
           avatar_URL: body.avatar_URL,
           highlight: body.highlight,
         },
