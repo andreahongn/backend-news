@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
     min: 8,
     max: 30,
   },
+  role: {
+    type: String,
+    default: "user",
+  },
   tokens: {
     type: String,
     default: "",

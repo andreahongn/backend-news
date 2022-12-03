@@ -40,6 +40,7 @@ router
         name: body.name,
         email: body.email,
         username: body.username,
+        role: body.role,
         password: hash,
       });
       await newUser.save();
@@ -83,6 +84,7 @@ router
         {
           username: user.username,
           email: user.email,
+          role: user.role,
           id: user._id,
         },
         process.env.TOKEN_SECRET
@@ -97,6 +99,7 @@ router
           username: user.username,
           password: user.password,
           email: user.email,
+          role: user.role,
           tokens: token,
         },
         {
@@ -143,6 +146,7 @@ router
           name: body.name,
           username: body.username,
           email: body.email,
+          role: body.role,
           password: body.password,
         },
         { new: true }
@@ -156,6 +160,34 @@ router
       });
     }
   })
+
+  // .post("/logout/:id", tokenValidation, async (req, res) => {
+  //   const token = req.header("auth-token");
+  //   const decodedToken = jwt.decode(token, { complete: true });
+  //   const SUPER_USER = process.env.SUPER_USER || "admin";
+
+  //   if (
+  //     body.username === SUPER_USER ||
+  //     !decodedToken.payload.role === "admin"
+  //   ) {
+  //     return res.status(400).json({
+  //       error: true,
+  //       message: "Acceso DENEGADO.",
+  //     });
+  //   }
+  //   try {
+  //     const deletedUser = await UserModel.findOneAndDelete({
+  //       _id: req.params.id,
+  //     });
+  //     res.status(200).json(deletedUser);
+  //   } catch (error) {
+  //     console.log(error);
+  //     res.status(404).json({
+  //       error: true,
+  //       message: error,
+  //     });
+  //   }
+  // })
 
   .delete("/deleteuser/:id", tokenValidation, async (req, res) => {
     const token = req.header("auth-token");
