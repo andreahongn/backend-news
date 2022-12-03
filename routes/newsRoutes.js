@@ -17,6 +17,7 @@ router
       author,
       content,
       highlight,
+      avatar_URL,
     } = req.body;
     const existsNews = await NewsModel.findOne({ title: req.body.title });
     console.log("existsNews", existsNews);
@@ -67,7 +68,8 @@ router
           content: body.content,
           author: body.author,
           date: body.date,
-          img_URL: body.img_URL,
+          URL_img: body.URL_img,
+          avatar_URL: body.avatar_URL,
           highlight: body.highlight,
         },
         { new: true }

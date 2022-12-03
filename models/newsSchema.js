@@ -6,6 +6,7 @@ const newsSchema = new mongoose.Schema({
   description: String,
   content: { type: String, required: true },
   img_URL: { type: String, required: true },
+  avatar_URL: { type: String },
   date: String,
   author: String,
   highlight: { type: Boolean, default: false },
