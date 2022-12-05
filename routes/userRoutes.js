@@ -111,6 +111,7 @@ router
         error: null,
         message: "Credentials are OK",
         data: { token },
+        role: user.role,
       });
     } else {
       return res.status(400).json({
