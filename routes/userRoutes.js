@@ -107,12 +107,15 @@ router
         }
       );
 
-      return res.header("auth-token", token).status(200).json({
-        error: null,
-        message: "Credentials are OK",
-        data: { token },
-        role: user.role,
-      });
+      return res
+        .header("auth-token", token)
+        .status(200)
+        .json({
+          error: null,
+          message: "Credentials are OK",
+          data: { token },
+          role: user.role || "user",
+        });
     } else {
       return res.status(400).json({
         error: true,
