@@ -86,9 +86,11 @@ router
 
   .delete("/deletenews/:id", async (req, res) => {
     try {
-      await NewsModel.findOneAndDelete({ _id: req.params.id });
+      const noticiaEliminada = await NewsModel.findOneAndDelete({
+        _id: req.params.id,
+      });
 
-      res.send("Noticia Eliminada");
+      res.status(200).json(noticiaEliminada);
     } catch (error) {
       console.log(error);
       res.status(404).json({

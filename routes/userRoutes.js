@@ -4,54 +4,68 @@ const { body, validationResult } = require("express-validator");
 const UserModel = require("../models/userSchema");
 const tokenValidation = require("./tokenValidation");
 const jwt = require("jsonwebtoken");
+const {
+  nameValidation,
+  passValidation,
+  emailValidation,
+  usernameValidation,
+  validation,
+} = require("../middlewares/validate.js");
 
 const bcrypt = require("bcryptjs");
 
 router
-  .post("/register", async (req, res) => {
-    // console.log("POST /users/register");
-    const { body } = req;
-    // Chequeo si el body no llega vacío para directamente devolver
-    if (!body.name || !body.username || !body.password || !body.email) {
-      return res.status(400).json({
-        error: true,
-        message: "The message has EMPTY fields.",
-      });
-    }
+  .post(
+    "/register",
+    // nameValidation(),
+    // passValidation(),
+    // emailValidation(),
+    // usernameValidation(),
+    // validation,
+    async (req, res) => {
+      const { body } = req;
 
-    const newUserNameExist = await UserModel.findOne({
-      username: body.username,
-    });
-    const newUserMailExist = await UserModel.findOne({
-      email: body.email,
-    });
-    if (newUserNameExist || newUserMailExist) {
-      return res.status(400).json({
-        error: true,
-        message: "User or email already EXISTS",
-      });
-    }
+      if (!body.name || !body.username || !body.password || !body.email) {
+        return res.status(400).json({
+          error: true,
+          message: "The message has EMPTY fields.",
+        });
+      }
 
-    // Aplico bcrypt
-    const salt = await bcrypt.genSalt();
-    const hash = await bcrypt.hash(body.password, salt);
-    try {
-      const newUser = new UserModel({
-        name: body.name,
-        email: body.email,
+      const newUserNameExist = await UserModel.findOne({
         username: body.username,
-        role: body.role,
-        password: hash,
       });
-      await newUser.save();
-      newUser.password = body.password;
-      res.status(200).json(newUser);
-      console.log("ADD user " + newUser.name);
-    } catch (error) {
-      console.log(error);
-      res.status(400).json({ error: true, message: error });
+      const newUserMailExist = await UserModel.findOne({
+        email: body.email,
+      });
+      if (newUserNameExist || newUserMailExist) {
+        return res.status(400).json({
+          error: true,
+          message: "User or email already EXISTS",
+        });
+      }
+
+      // Aplico bcrypt
+      const salt = await bcrypt.genSalt();
+      const hash = await bcrypt.hash(body.password, salt);
+      try {
+        const newUser = new UserModel({
+          name: body.name,
+          email: body.email,
+          username: body.username,
+          role: body.role,
+          password: hash,
+        });
+        await newUser.save();
+        newUser.password = body.password;
+        res.status(200).json(newUser);
+        console.log("ADD user " + newUser.name);
+      } catch (error) {
+        console.log(error);
+        res.status(400).json({ error: true, message: error });
+      }
     }
-  })
+  )
 
   .post("/login", async (req, res, next) => {
     const { body } = req;
