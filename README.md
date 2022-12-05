@@ -8,3 +8,14 @@ Blog donde se muestran noticias deportivas divididas en cuatro categorías. Cons
 
 Para finalizar nos gustaría agradecer a la comunidad de Rolling y, especialmente, a nuestro tutor Diego Grassino y a nuestro mentor Andres Perlo, que estuvieron siempre a dispoción nuestra, ayudándonos y dándonos invaluables consejos a lo largo del curso y de los diferentes proyectos que lo conforman.
 
+link deploy back: https://backend-news-eight.vercel.app/
+
+rutas de interes:
+
+usuarios:
+https://backend-news-eight.vercel.app/users/verusuarios
+https://backend-news-eight.vercel.app/users/login
+https://backend-news-eight.vercel.app/users/register
+
+news:
+https://backend-news-eight.vercel.app/news/news
