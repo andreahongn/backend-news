@@ -66,8 +66,6 @@ router
     const user = await UserModel.findOne({
       username: body.username,
     });
-    console.log("BBDD connection.");
-    console.log(user);
 
     if (!user) {
       return res.status(400).json({
@@ -89,9 +87,7 @@ router
         },
         process.env.TOKEN_SECRET
       );
-      console.log("token1:" + token);
 
-      // añado token a usuario
       const userToAddToken = await UserModel.findOneAndUpdate(
         { username: body.username },
         {
