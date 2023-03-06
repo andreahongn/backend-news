@@ -121,8 +121,9 @@ router
       //     useFindAndModify: false,
       //   }
       // );
-      res.status(200).json(user);
 
+      // res.status(200).json(user);
+      return res.header("Authorization", token).status(200).json(user);
       // return res
       //   .header("auth-token", token)
       //   .status(200)
