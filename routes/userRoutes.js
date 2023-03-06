@@ -58,8 +58,8 @@ router
         });
         await newUser.save();
         newUser.password = body.password;
-        res.status(200).json(newUser);
-        console.log("ADD user " + newUser.name);
+        res.status(200).json(newUser.username);
+        // console.log("ADD user " + newUser.name);
       } catch (error) {
         console.log(error);
         res.status(400).json({ error: true, message: error });
