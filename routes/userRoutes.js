@@ -58,8 +58,11 @@ router
         });
         await newUser.save();
         newUser.password = body.password;
-        res.status(200).json(newUser.username);
-        // console.log("ADD user " + newUser.name);
+        res.status(200).json({
+          error: null,
+          message: "You are authorized to access the requested resource.",
+          role: newUser.role,
+        });
       } catch (error) {
         console.log(error);
         res.status(400).json({ error: true, message: error });
