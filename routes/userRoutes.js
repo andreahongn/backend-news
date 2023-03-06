@@ -17,11 +17,11 @@ const bcrypt = require("bcryptjs");
 router
   .post(
     "/register",
-    // nameValidation(),
-    // passValidation(),
-    // emailValidation(),
-    // usernameValidation(),
-    // validation,
+    nameValidation(),
+    passValidation(),
+    emailValidation(),
+    usernameValidation(),
+    validation,
     async (req, res) => {
       const { body } = req;
 
@@ -211,6 +211,8 @@ router
 
   .delete("/deleteuser/:id", tokenValidation, async (req, res) => {
     const token = req.header("auth-token");
+
+    console.log(token);
     const decodedToken = jwt.decode(token, { complete: true });
     const SUPER_USER = process.env.SUPER_USER || "admin";
 
