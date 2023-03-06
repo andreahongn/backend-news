@@ -123,7 +123,11 @@ router
       // );
 
       // res.status(200).json(user);
-      return res.header("Authorization", token).status(200).json(user);
+      return res.header("Authorization", token).status(200).json({
+        error: null,
+        message: "You are authorized to access the requested resource.",
+        role: user.role,
+      });
       // return res
       //   .header("auth-token", token)
       //   .status(200)
