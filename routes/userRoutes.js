@@ -130,6 +130,7 @@ router
         error: null,
         message: "You are authorized to access the requested resource.",
         role: user.role,
+        data: { token },
       });
       // return res
       //   .header("auth-token", token)
