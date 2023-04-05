@@ -9,7 +9,7 @@ const usernameValidation = () => {
     body("username")
       .exists()
       .isLength({ min: 3, max: 31 })
-      .isAlphanumeric()
+
       .trim(),
   ];
 };
