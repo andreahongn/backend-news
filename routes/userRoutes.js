@@ -45,6 +45,41 @@ router
         });
       }
 
+      const usernameValidation = () => {
+        if (!/^[a-zA-ZÀ-ÿ]{1}$/i.test(body.username.trim().charAt(0))) {
+          return "the user name first character must be a letter";
+        } else if (
+          !/^[a-zA-ZÀ-ÿ\s0-9-_]{3,30}$/i.test(
+            body.username.trim().slice(1, body.username.trim().length)
+          )
+        ) {
+          return "the user can only have keyboard scripts as symbols";
+        } else if (!/^[\S]{3,30}$/i.test(body.username.trim())) {
+          return "the user must not have spaces ";
+        } else {
+          return null;
+        }
+      };
+
+      if (usernameValidation()) {
+        return res.status(400).json({
+          error: true,
+          message: usernameValidation(),
+        });
+      }
+
+      const passwordCharactersValidation =
+        !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])([A-Za-z\d$@$!%*?&]|[^ ]){8,30}$/i.test(
+          body.password
+        );
+      if (passwordCharactersValidation) {
+        return res.status(400).json({
+          error: true,
+          message:
+            "the password must have at lest one special character , one digit and one uppercase",
+        });
+      }
+
       // Aplico bcrypt
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(body.password, salt);
