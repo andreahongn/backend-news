@@ -160,23 +160,17 @@ router
       //   }
       // );
 
-      res.status(200).json(user);
-      // return res.header("auth-token", token).status(200).json({
-      //   error: null,
-      //   message: "You are authorized to access the requested resource.",
-      //   role: user.role,
-      //   data: { token },
-      // });
+      // res.status(200).json(user);
 
-      // return res
-      //   .header("auth-token", token)
-      //   .status(200)
-      //   .json({
-      //     error: null,
-      //     message: "Credentials are OK",
-      //     data: { token },
-      //     role: user.role || "user",
-      //   });
+      return res
+        .header("auth-token", token)
+        .status(200)
+        .json({
+          error: null,
+          message: "Credentials are OK",
+          data: { token },
+          role: user.role || "user",
+        });
     } else {
       return res.status(400).json({
         error: true,
