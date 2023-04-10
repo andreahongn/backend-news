@@ -160,17 +160,14 @@ router
       //   }
       // );
 
-      res.status(200).json(user);
+      // res.status(200).json(user);
 
-      // return res
-      //   .header("auth-token", token)
-      //   .status(200)
-      //   .json({
-      //     error: null,
-      //     message: "Credentials are OK",
-      //     data: { token },
-      //     role: user.role || "user",
-      //   });
+      return res.status(200).json({
+        error: null,
+        message: "Credentials are OK",
+        token: user.tokens,
+        role: user.role,
+      });
     } else {
       return res.status(400).json({
         error: true,
