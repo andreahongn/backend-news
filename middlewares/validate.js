@@ -5,13 +5,7 @@ const nameValidation = () => {
 };
 
 const usernameValidation = () => {
-  return [
-    body("username")
-      .exists()
-      .isLength({ min: 3, max: 31 })
-
-      .trim(),
-  ];
+  return [body("username").exists().isLength({ min: 3, max: 31 }).trim()];
 };
 const passValidation = () => {
   return [body("password").exists().isLength({ min: 8, max: 31 })];

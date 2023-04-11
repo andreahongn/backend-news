@@ -167,6 +167,7 @@ router
         message: "Credentials are OK",
         token: user.tokens,
         role: user.role,
+        username: user.username,
       });
     } else {
       return res.status(400).json({
