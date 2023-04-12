@@ -50,7 +50,7 @@ router
         if (!/^[a-zA-ZÀ-ÿ]{1}$/i.test(body.username.trim().charAt(0))) {
           return "the user name first character must be a letter";
         } else if (
-          !/^[a-zA-ZÀ-ÿ\s0-9-_]{3,30}$/i.test(
+          !/^[a-zA-ZÀ-ÿ\s0-9-_]{2,30}$/i.test(
             body.username.trim().slice(1, body.username.trim().length)
           )
         ) {
