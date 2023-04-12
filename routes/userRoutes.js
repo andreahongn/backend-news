@@ -174,14 +174,16 @@ router
     tokenValidation(process.env.SUPER_USER),
     async (req, res) => {
       try {
+        const usuarioAeditar = await UserModel.findOne({ _id: req.params.id });
         const usuarioEditado = await UserModel.findOneAndUpdate(
           { _id: req.params.id },
           {
             name: body.name,
             username: body.username,
             email: body.email,
-            role: body.role,
-            password: body.password,
+            role: usuarioAeditar.role,
+            password: usuarioAeditar.password,
+            tokens: usuarioAeditar.tokens,
           },
           { new: true }
         );
