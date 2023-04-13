@@ -237,9 +237,9 @@ router
   .put("/favoritecreate:id", tokenValidation("user"), async (req, res) => {
     const { favorites } = req.body;
     try {
-      const usuarioAeditar = await UserModel.findOne({ _id: req.params.id });
+      const usuarioAeditar = await UserModel.findOne({ _id: req.query.id });
       const usuarioEditado = await UserModel.findOneAndUpdate(
-        { _id: req.params.id },
+        { _id: req.query.id },
         {
           name: usuarioAeditar.name,
           username: usuarioAeditar.username,
