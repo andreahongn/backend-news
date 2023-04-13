@@ -234,7 +234,7 @@ router
       }
     }
   )
-  .put("/favoritecreate", tokenValidation("user"), async (req, res) => {
+  .put("/favoritecreate:id", tokenValidation("user"), async (req, res) => {
     const { favorites } = req.body;
     try {
       const usuarioAeditar = await UserModel.findOne({ _id: req.params.id });
