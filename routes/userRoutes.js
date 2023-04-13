@@ -262,6 +262,6 @@ router
   })
   .get("/favorite", tokenValidation("user"), async (req, res) => {
     const usuario = await UserModel.find({ _id: req.query.id });
-    res.send(usuario.favorites);
+    res.send(usuario);
   });
 module.exports = router;
