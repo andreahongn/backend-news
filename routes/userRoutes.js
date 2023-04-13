@@ -130,7 +130,6 @@ router
     const passwordOk = await bcrypt.compare(body.password, user.password);
 
     if (user && passwordOk) {
-      // creo token
       const token = jwt.sign(
         {
           username: user.username,
@@ -151,6 +150,7 @@ router
         token: user.tokens,
         role: user.role,
         username: user.username,
+        id: user._id,
       });
     } else {
       return res.status(400).json({
@@ -185,6 +185,7 @@ router
             role: usuarioAeditar.role,
             password: usuarioAeditar.password,
             tokens: usuarioAeditar.tokens,
+            favorites: usuarioAeditar.favorites,
           },
           { new: true }
         );
@@ -232,5 +233,35 @@ router
         });
       }
     }
-  );
+  )
+  .put("/favoritecreate", tokenValidation("user"), async (req, res) => {
+    const { favorites } = req.body;
+    try {
+      const usuarioAeditar = await UserModel.findOne({ _id: req.params.id });
+      const usuarioEditado = await UserModel.findOneAndUpdate(
+        { _id: req.params.id },
+        {
+          name: usuarioAeditar.name,
+          username: usuarioAeditar.username,
+          email: usuarioAeditar.email,
+          role: usuarioAeditar.role,
+          password: usuarioAeditar.password,
+          tokens: usuarioAeditar.tokens,
+          favorites: favorites,
+        },
+        { new: true }
+      );
+      res.status(200).json(usuarioEditado);
+    } catch (error) {
+      console.log(error);
+      res.status(404).json({
+        error: true,
+        message: error,
+      });
+    }
+  })
+  .get("/favorite:id", tokenValidation("user"), async (req, res) => {
+    const usuario = await UserModel.findOne({ _id: req.params.id });
+    res.send(usuario.favorites);
+  });
 module.exports = router;
