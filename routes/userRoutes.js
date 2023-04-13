@@ -260,8 +260,8 @@ router
       });
     }
   })
-  .get("/favorite:id", tokenValidation("user"), async (req, res) => {
-    const usuario = await UserModel.findOne({ _id: req.params.id });
-    res.send(usuario.favorites);
+  .get("/favorite", tokenValidation("user"), async (req, res) => {
+    const usuario = await UserModel.find({ _id: req.query.id });
+    res.send(usuario[0].favorites);
   });
 module.exports = router;
