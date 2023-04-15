@@ -164,8 +164,18 @@ router
     "/verusuarios",
     tokenValidation(process.env.SUPER_USER),
     async (req, res) => {
+      const usuariosFilter = [];
       const usuarios = await UserModel.find();
-      res.send(usuarios);
+      await usuarios.forEach((element) => {
+        usuariosFilter.push({
+          _id: element._id,
+          name: element.name,
+          username: element.username,
+          email: element.email,
+        });
+      });
+
+      res.send(usuariosFilter);
     }
   )
 
@@ -189,7 +199,7 @@ router
           },
           { new: true }
         );
-        res.status(200).json(usuarioEditado);
+        res.status(200).json({ name, username, email });
       } catch (error) {
         console.log(error);
         res.status(404).json({
@@ -251,7 +261,7 @@ router
         },
         { new: true }
       );
-      res.status(200).json(usuarioEditado);
+      res.status(200).json({ messaje: "usuario editado co rrectamente" });
     } catch (error) {
       console.log(error);
       res.status(404).json({
