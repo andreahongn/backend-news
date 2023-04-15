@@ -175,6 +175,7 @@ router
           name: element.name,
           username: element.username,
           email: element.email,
+          role: element.role,
         }))
       );
     }
