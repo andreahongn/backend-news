@@ -6,16 +6,17 @@ const sendMailer = async (name, email) => {
     port: 587,
     secure: false, // upgrade later with STARTTLS
     auth: {
-      user: "andreahongn@gmail.com",
-      pass: "bhzdvsshjixxrrlv",
+      user: process.env.MAIL_NODEMAILER,
+      pass: process.env.PASSWORD_APP,
     },
   };
 
   const message = {
-    from: "andreahongn@gmail.com",
+    from: process.env.MAIL_NODEMAILER,
     to: email,
     subject: "Bienvenid@ a la Rollingneta",
-    html: `<h1>Hola ${name} !! Te subiste a la Rollingneta con éxito. Ahora podés acceder a las últimas novedades del mundo deportivo</h1>
+    html: `<h1>Hola ${name} !! Te subiste a la Rollingneta con éxito</h1>
+    <h2>Ahora podés acceder a las últimas novedades del mundo deportivo</h2>
     <img src="https://www.mundoprimaria.com/wp-content/uploads/2020/07/deporte.jpg" alt="sports">
     <h5>Por favor no responder este mail</h5>`,
   };
