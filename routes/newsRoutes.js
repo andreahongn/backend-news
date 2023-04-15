@@ -45,17 +45,21 @@ router
     }
   })
 
-  .get("/news/:id", async (req, res) => {
-    try {
-      const news = await NewsModel.findOne({ _id: req.params.id });
-      res.status(200).json(news);
-    } catch (error) {
-      res.status(404).json({
-        error: true,
-        message: error,
-      });
+  .get(
+    "/news/:id",
+    tokenValidation([process.env.SUPER_USER, "user"]),
+    async (req, res) => {
+      try {
+        const news = await NewsModel.findOne({ _id: req.params.id });
+        res.status(200).json(news);
+      } catch (error) {
+        res.status(404).json({
+          error: true,
+          message: error,
+        });
+      }
     }
-  })
+  )
 
   .put(
     "/editnews/:id",
