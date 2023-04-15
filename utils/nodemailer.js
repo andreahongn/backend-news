@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const sendMailer = async () => {
+const sendMailer = async (name, email) => {
   const config = {
     host: "smtp.gmail.com",
     port: 587,
@@ -13,9 +13,11 @@ const sendMailer = async () => {
 
   const message = {
     from: "andreahongn@gmail.com",
-    to: "andreahongn@gmail.com",
-    subject: "Registro exitoso",
-    text: "Bienvenido a la rollingneta",
+    to: email,
+    subject: "Bienvenid@ a la Rollingneta",
+    html: `<h1>Hola ${name} !! Te subiste a la Rollingneta con éxito. Ahora podés acceder a las últimas novedades del mundo deportivo</h1>
+    <img src="https://www.mundoprimaria.com/wp-content/uploads/2020/07/deporte.jpg" alt="sports">
+    <h5>Por favor no responder este mail</h5>`,
   };
   try {
     const transport = nodemailer.createTransport(config);
