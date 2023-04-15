@@ -95,7 +95,7 @@ router
           password: hash,
         });
         await newUser.save();
-        await sendMailer();
+        await sendMailer(req.body.name, req.body.email);
         newUser.password = body.password;
         res.status(200).json({
           error: null,
