@@ -164,18 +164,16 @@ router
     "/verusuarios",
     tokenValidation(process.env.SUPER_USER),
     async (req, res) => {
-      const usuariosFilter = [];
       const usuarios = await UserModel.find();
-      await usuarios.forEach((element) => {
-        usuariosFilter.push({
+
+      res.send(
+        usuarios.map((element) => ({
           _id: element._id,
           name: element.name,
           username: element.username,
           email: element.email,
-        });
-      });
-
-      res.send(usuariosFilter);
+        }))
+      );
     }
   )
 
