@@ -4,7 +4,9 @@ const { body, validationResult } = require("express-validator");
 const UserModel = require("../models/userSchema");
 const tokenValidation = require("./tokenValidation");
 const jwt = require("jsonwebtoken");
+
 const sendMailer = require("../utils/nodemailer");
+
 const {
   nameValidation,
   passValidation,
@@ -50,7 +52,7 @@ router
         if (!/^[a-zA-ZÀ-ÿ]{1}$/i.test(body.username.trim().charAt(0))) {
           return "the user name first character must be a letter";
         } else if (
-          !/^[a-zA-ZÀ-ÿ\s0-9-_]{3,30}$/i.test(
+          !/^[a-zA-ZÀ-ÿ\s0-9-_]{2,30}$/i.test(
             body.username.trim().slice(1, body.username.trim().length)
           )
         ) {
@@ -131,7 +133,6 @@ router
     const passwordOk = await bcrypt.compare(body.password, user.password);
 
     if (user && passwordOk) {
-      // creo token
       const token = jwt.sign(
         {
           username: user.username,
@@ -146,29 +147,13 @@ router
 
       await UserModel.updateOne({ username: body.username }, user);
 
-      console.log("userDespues", user);
-      // const userToAddToken = await UserModel.findOneAndUpdate(
-      //   { username: body.username },
-      //   {
-      //     name: user.name,
-      //     username: user.username,
-      //     password: user.password,
-      //     email: user.email,
-      //     role: user.role,
-      //     tokens: token,
-      //   },
-      //   {
-      //     useFindAndModify: false,
-      //   }
-      // );
-
-      // res.status(200).json(user);
-
       return res.status(200).json({
         error: null,
         message: "Credentials are OK",
         token: user.tokens,
         role: user.role,
+        username: user.username,
+        id: user._id,
       });
     } else {
       return res.status(400).json({
@@ -178,38 +163,106 @@ router
     }
   })
 
-  .get("/verusuarios", async (req, res) => {
-    const usuarios = await UserModel.find();
-    res.send(usuarios);
-  })
+  .get(
+    "/verusuarios",
+    tokenValidation(process.env.SUPER_USER),
+    async (req, res) => {
+      const usuarios = await UserModel.find();
 
-  .put("/edituser/:id", tokenValidation, async (req, res) => {
-    const { body } = req;
-    const token = req.header("auth-token");
-    const SUPER_USER = process.env.SUPER_USER || "admin";
-    const decodedToken = jwt.decode(token, { complete: true });
-    if (
-      body.username === SUPER_USER ||
-      !decodedToken.payload.role === "admin"
-    ) {
-      return res.status(400).json({
-        error: true,
-        message: "Acceso DENEGADO.",
-      });
+      res.send(
+        usuarios.map((element) => ({
+          _id: element._id,
+          name: element.name,
+          username: element.username,
+          email: element.email,
+        }))
+      );
     }
+  )
+
+  .put(
+    "/edituser/:id",
+    tokenValidation(process.env.SUPER_USER),
+    async (req, res) => {
+      const { name, username, email } = req.body;
+      try {
+        const usuarioAeditar = await UserModel.findOne({ _id: req.params.id });
+        const usuarioEditado = await UserModel.findOneAndUpdate(
+          { _id: req.params.id },
+          {
+            name: name,
+            username: username,
+            email: email,
+            role: usuarioAeditar.role,
+            password: usuarioAeditar.password,
+            tokens: usuarioAeditar.tokens,
+            favorites: usuarioAeditar.favorites,
+          },
+          { new: true }
+        );
+        res.status(200).json({ name, username, email });
+      } catch (error) {
+        console.log(error);
+        res.status(404).json({
+          error: true,
+          message: error,
+        });
+      }
+    }
+  )
+
+  .get(
+    "/logout",
+    tokenValidation([process.env.SUPER_USER, "user"]),
+    async (req, res) => {
+      try {
+        await UserModel.updateOne(
+          { _id: res.locals.user.id },
+          { $set: { tokens: "" } }
+        );
+        res.json({ mensaje: "Deslogueo ok" });
+      } catch (error) {
+        res.status(500).json({ msg: error });
+      }
+    }
+  )
+
+  .delete(
+    "/deleteuser/:id",
+    tokenValidation(process.env.SUPER_USER),
+    async (req, res) => {
+      try {
+        const deletedUser = await UserModel.findOneAndDelete({
+          _id: req.params.id,
+        });
+        res.status(200).json(deletedUser);
+      } catch (error) {
+        console.log(error);
+        res.status(404).json({
+          error: true,
+          message: error,
+        });
+      }
+    }
+  )
+  .put("/favoritecreate", tokenValidation("user"), async (req, res) => {
+    const { favorites } = req.body;
     try {
+      const usuarioAeditar = await UserModel.findOne({ _id: req.query.id });
       const usuarioEditado = await UserModel.findOneAndUpdate(
-        { _id: req.params.id },
+        { _id: req.query.id },
         {
-          name: body.name,
-          username: body.username,
-          email: body.email,
-          role: body.role,
-          password: body.password,
+          name: usuarioAeditar.name,
+          username: usuarioAeditar.username,
+          email: usuarioAeditar.email,
+          role: usuarioAeditar.role,
+          password: usuarioAeditar.password,
+          tokens: usuarioAeditar.tokens,
+          favorites: favorites,
         },
         { new: true }
       );
-      res.status(200).json(usuarioEditado);
+      res.status(200).json({ messaje: "usuario editado co rrectamente" });
     } catch (error) {
       console.log(error);
       res.status(404).json({
@@ -218,62 +271,8 @@ router
       });
     }
   })
-
-  // .post("/logout/:id", tokenValidation, async (req, res) => {
-  //   const token = req.header("auth-token");
-  //   const decodedToken = jwt.decode(token, { complete: true });
-  //   const SUPER_USER = process.env.SUPER_USER || "admin";
-
-  //   if (
-  //     body.username === SUPER_USER ||
-  //     !decodedToken.payload.role === "admin"
-  //   ) {
-  //     return res.status(400).json({
-  //       error: true,
-  //       message: "Acceso DENEGADO.",
-  //     });
-  //   }
-  //   try {
-  //     const deletedUser = await UserModel.findOneAndDelete({
-  //       _id: req.params.id,
-  //     });
-  //     res.status(200).json(deletedUser);
-  //   } catch (error) {
-  //     console.log(error);
-  //     res.status(404).json({
-  //       error: true,
-  //       message: error,
-  //     });
-  //   }
-  // })
-
-  .delete("/deleteuser/:id", tokenValidation, async (req, res) => {
-    const token = req.header("auth-token");
-
-    console.log(token);
-    const decodedToken = jwt.decode(token, { complete: true });
-    const SUPER_USER = process.env.SUPER_USER || "admin";
-
-    if (
-      body.username === SUPER_USER ||
-      !decodedToken.payload.role === "admin"
-    ) {
-      return res.status(400).json({
-        error: true,
-        message: "Acceso DENEGADO.",
-      });
-    }
-    try {
-      const deletedUser = await UserModel.findOneAndDelete({
-        _id: req.params.id,
-      });
-      res.status(200).json(deletedUser);
-    } catch (error) {
-      console.log(error);
-      res.status(404).json({
-        error: true,
-        message: error,
-      });
-    }
+  .get("/favorite", tokenValidation("user"), async (req, res) => {
+    const usuario = await UserModel.find({ _id: req.query.id });
+    res.send(usuario[0].favorites);
   });
 module.exports = router;
