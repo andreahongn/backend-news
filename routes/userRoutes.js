@@ -4,6 +4,7 @@ const { body, validationResult } = require("express-validator");
 const UserModel = require("../models/userSchema");
 const tokenValidation = require("./tokenValidation");
 const jwt = require("jsonwebtoken");
+const sendMailer = require("../utils/nodemailer");
 const {
   nameValidation,
   passValidation,
@@ -92,6 +93,7 @@ router
           password: hash,
         });
         await newUser.save();
+        await sendMailer();
         newUser.password = body.password;
         res.status(200).json({
           error: null,
