@@ -289,7 +289,6 @@ router
 
     res.send(
       currentNews.reduce((valorAnterior, valorActual) => {
-        let actual = valorActual._id.toString().slice(12, -1);
         let filter = usuario[0].favorites.filter(
           (element) => element._id === valorActual._id.toString()
         )[0];
