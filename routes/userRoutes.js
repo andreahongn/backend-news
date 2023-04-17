@@ -260,7 +260,7 @@ router
     const { favorites } = req.body;
     try {
       const usuarioAeditar = await UserModel.findOne({ _id: req.query.id });
-      const currentNews = await NewsModel.find();
+
       const usuarioEditado = await UserModel.findOneAndUpdate(
         { _id: req.query.id },
         {
@@ -270,9 +270,7 @@ router
           role: usuarioAeditar.role,
           password: usuarioAeditar.password,
           tokens: usuarioAeditar.tokens,
-          favorites: currentNews.filter((currentNew) =>
-            favorites.filter((favorite) => favorite._id === currentNew._id)
-          ),
+          favorites: favorites,
         },
         { new: true }
       );
@@ -287,6 +285,21 @@ router
   })
   .get("/favorite", tokenValidation("user"), async (req, res) => {
     const usuario = await UserModel.find({ _id: req.query.id });
-    res.send(usuario[0].favorites);
+    const currentNews = await NewsModel.find();
+
+    res.send(
+      currentNews.reduce((valorAnterior, valorActual) => {
+        let actual = valorActual._id.toString().slice(12, -1);
+        let filter = usuario[0].favorites.filter(
+          (element) => element._id === valorActual._id.toString()
+        )[0];
+
+        if (filter) {
+          valorAnterior.push(filter);
+        }
+
+        return valorAnterior;
+      }, [])
+    );
   });
 module.exports = router;
