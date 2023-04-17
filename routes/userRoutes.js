@@ -271,7 +271,7 @@ router
         },
         { new: true }
       );
-      res.status(200).json({ messaje: "usuario editado co rrectamente" });
+      res.status(200).json({ messaje: "user edited correctly" });
     } catch (error) {
       console.log(error);
       res.status(404).json({
