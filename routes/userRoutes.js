@@ -83,6 +83,13 @@ router
         });
       }
 
+      if (!body.termsandconditions) {
+        return res.status(400).json({
+          error: true,
+          message: "You must accept the terms and conditions",
+        });
+      }
+
       // Aplico bcrypt
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(body.password, salt);
@@ -93,9 +100,10 @@ router
           username: body.username,
           role: body.role,
           password: hash,
+          termsandconditions: body.termsandconditions,
         });
         await newUser.save();
-        await sendMailer(req.body.name, req.body.email);
+        await sendMailer();
         newUser.password = body.password;
         res.status(200).json({
           error: null,

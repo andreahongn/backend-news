@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  termsandconditions: {
+    type: Boolean,
+    required: true,
+  },
 
   favorites: { type: Array },
   default: [],
