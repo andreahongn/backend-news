@@ -271,7 +271,7 @@ router
           password: usuarioAeditar.password,
           tokens: usuarioAeditar.tokens,
           favorites: currentNews.filter((currentNew) =>
-            favorites.forEach((favorite) => favorite._id === currentNew._id)
+            favorites.filter((favorite) => favorite._id === currentNew._id)
           ),
         },
         { new: true }
