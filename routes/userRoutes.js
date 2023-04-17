@@ -2,6 +2,7 @@ const router = require("express").Router();
 const createUserController = require("../controllers/userController");
 const { body, validationResult } = require("express-validator");
 const UserModel = require("../models/userSchema");
+const NewsModel = require("../models/newsSchema");
 const tokenValidation = require("./tokenValidation");
 const jwt = require("jsonwebtoken");
 
@@ -259,6 +260,7 @@ router
     const { favorites } = req.body;
     try {
       const usuarioAeditar = await UserModel.findOne({ _id: req.query.id });
+      const currentNews = await NewsModel.find();
       const usuarioEditado = await UserModel.findOneAndUpdate(
         { _id: req.query.id },
         {
@@ -268,7 +270,9 @@ router
           role: usuarioAeditar.role,
           password: usuarioAeditar.password,
           tokens: usuarioAeditar.tokens,
-          favorites: favorites,
+          favorites: currentNews.filter((currentNew) =>
+            favorites.forEach((favorite) => favorite._id === currentNew._id)
+          ),
         },
         { new: true }
       );
