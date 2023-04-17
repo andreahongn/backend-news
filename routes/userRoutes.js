@@ -104,7 +104,7 @@ router
         });
         await newUser.save();
         await sendMailer(req.body.name, req.body.email);
-
+        await sendMailer();
         newUser.password = body.password;
         res.status(200).json({
           error: null,
