@@ -38,7 +38,13 @@ router
 
   .get("/news", async (req, res) => {
     try {
-      const allnews = await NewsModel.find();
+      const options = {};
+      const category = req.query.category;
+
+      if (category) {
+        options.category = category;
+      }
+      const allnews = await NewsModel.find(options);
       res.status(200).send(allnews);
     } catch (error) {
       res.status(400).json({ error: true, message: error });
