@@ -38,13 +38,7 @@ router
 
   .get("/news", async (req, res) => {
     try {
-      const options = {};
-      const category = req.query.category;
-
-      if (category) {
-        options.category = category;
-      }
-      const allnews = await NewsModel.find(options);
+      const allnews = await NewsModel.find();
       res.status(200).send(allnews);
     } catch (error) {
       res.status(400).json({ error: true, message: error });
@@ -57,6 +51,21 @@ router
     async (req, res) => {
       try {
         const news = await NewsModel.findOne({ _id: req.params.id });
+        res.status(200).json(news);
+      } catch (error) {
+        res.status(404).json({
+          error: true,
+          message: error,
+        });
+      }
+    }
+  )
+  .get(
+    "/news/:category",
+    tokenValidation([process.env.SUPER_USER, "user"]),
+    async (req, res) => {
+      try {
+        const news = await NewsModel.findOne({ _id: req.params.category });
         res.status(200).json(news);
       } catch (error) {
         res.status(404).json({
