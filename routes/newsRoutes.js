@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { body, validationResult } = require("express-validator");
+const { body, validationResult, query } = require("express-validator");
 const NewsModel = require("../models/newsSchema");
 const tokenValidation = require("./tokenValidation");
 
@@ -40,6 +40,15 @@ router
     try {
       const allnews = await NewsModel.find();
       res.status(200).send(allnews);
+    } catch (error) {
+      res.status(400).json({ error: true, message: error });
+    }
+  })
+  .get("/highlight", async (req, res) => {
+    try {
+      const queryHighlight = req.query.highlight;
+      const highlight = await NewsModel.find({ highlight: queryHighlight });
+      res.status(200).send(highlight);
     } catch (error) {
       res.status(400).json({ error: true, message: error });
     }
