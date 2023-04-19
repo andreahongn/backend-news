@@ -15,6 +15,8 @@ const newsSchema = new mongoose.Schema({
   author: String,
   highlight: { type: Boolean, default: false },
 });
+
+
 const NewsModel = mongoose.model("news", newsSchema);
 
 module.exports = NewsModel;

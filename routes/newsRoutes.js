@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { body, validationResult, query } = require("express-validator");
 const NewsModel = require("../models/newsSchema");
+
 const tokenValidation = require("./tokenValidation");
 
 router
@@ -40,6 +41,38 @@ router
     try {
       const allnews = await NewsModel.find();
       res.status(200).send(allnews);
+    } catch (error) {
+      res.status(400).json({ error: true, message: error });
+    }
+  })
+  .get("/search", async (req, res) => {
+    try {
+      const characters = req.query.characters;
+      const news = await NewsModel.find();
+
+      const newsFilter = news.filter((element) => {
+        if (
+          element.title
+            .toUpperCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .includes(characters.toUpperCase()) ||
+          element.category
+            .toUpperCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .includes(characters.toUpperCase()) ||
+          element.description
+            .toUpperCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .includes(characters.toUpperCase())
+        ) {
+          return element;
+        }
+      });
+
+      res.status(200).send(newsFilter);
     } catch (error) {
       res.status(400).json({ error: true, message: error });
     }
