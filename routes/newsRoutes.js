@@ -129,6 +129,56 @@ router
     tokenValidation(process.env.SUPER_USER),
     async (req, res) => {
       const { body } = req;
+      const errorsNews = [];
+
+      const fieldValues = [
+        { name: "title", value: body.title },
+        { name: "description", value: body.description },
+        { name: "author", value: body.author },
+        { name: "content", value: body.content },
+        { name: "image", value: body.img_URL },
+        { name: "category", value: body.category },
+      ];
+
+      const validateField = (value, name) => {
+        let error;
+        if (value.trim() === "") {
+          error = `field  ${name} empty`;
+        } else if (value.trim().length < 3) {
+          error = `The field ${name} must have at least 3 characters`;
+        } else {
+          error = true;
+        }
+        return error;
+      };
+
+      fieldValues.forEach((element) => {
+        if (validateField(element.value, element.name) !== true) {
+          errorsNews.push(validateField(element.value, element.name));
+        }
+      });
+
+      if (
+        (body.title.trim() === "",
+        body.category.trim() === "",
+        body.description.trim() === "",
+        body.content.trim() === "",
+        body.author.trim() === "",
+        body.img_URL.trim() === "")
+      ) {
+        return res.status(400).json({
+          error: true,
+          message: "All the fields are empty",
+        });
+      }
+
+      if (errorsNews.length > 0) {
+        return res.status(400).json({
+          error: true,
+          message: errorsNews.join("; "),
+        });
+      }
+
       try {
         const noticiaEditada = await NewsModel.findOneAndUpdate(
           { _id: req.params.id },
