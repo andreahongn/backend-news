@@ -45,38 +45,42 @@ router
       res.status(400).json({ error: true, message: error });
     }
   })
-  .get("/search", async (req, res) => {
-    try {
-      const characters = req.query.characters;
-      const news = await NewsModel.find();
+  .get(
+    "/search",
+    tokenValidation([process.env.SUPER_USER, "user"]),
+    async (req, res) => {
+      try {
+        const characters = req.query.characters;
+        const news = await NewsModel.find();
 
-      const newsFilter = news.filter((element) => {
-        if (
-          element.title
-            .toUpperCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .includes(characters.toUpperCase()) ||
-          element.category
-            .toUpperCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .includes(characters.toUpperCase()) ||
-          element.description
-            .toUpperCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .includes(characters.toUpperCase())
-        ) {
-          return element;
-        }
-      });
+        const newsFilter = news.filter((element) => {
+          if (
+            element.title
+              .toUpperCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .includes(characters.toUpperCase()) ||
+            element.category
+              .toUpperCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .includes(characters.toUpperCase()) ||
+            element.description
+              .toUpperCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .includes(characters.toUpperCase())
+          ) {
+            return element;
+          }
+        });
 
-      res.status(200).send(newsFilter);
-    } catch (error) {
-      res.status(400).json({ error: true, message: error });
+        res.status(200).send(newsFilter);
+      } catch (error) {
+        res.status(400).json({ error: true, message: error });
+      }
     }
-  })
+  )
   .get("/highlight", async (req, res) => {
     try {
       const queryHighlight = req.query.highlight;
