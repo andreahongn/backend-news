@@ -87,9 +87,14 @@ router
     }
   )
   .get("/highlight", async (req, res) => {
+    const limit = req.query.limit;
+    const page = req.query.page;
     try {
       const queryHighlight = req.query.highlight;
-      const highlight = await NewsModel.find({ highlight: queryHighlight });
+      const highlight = await NewsModel.paginate(
+        { highlight: queryHighlight },
+        { limit: limit, page: page }
+      );
       res.status(200).send(highlight);
     } catch (error) {
       res.status(400).json({ error: true, message: error });
