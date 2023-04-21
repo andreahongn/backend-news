@@ -41,7 +41,10 @@ router
     const limit = req.query.limit;
     const page = req.query.page;
     try {
-      const allnews = await NewsModel.paginate({ limit: limit, page: page });
+      const allnews = await NewsModel.paginate(
+        {},
+        { limit: limit, page: page }
+      );
       res.status(200).send(allnews);
     } catch (error) {
       res.status(400).json({ error: true, message: error });
