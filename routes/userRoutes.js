@@ -194,7 +194,10 @@ router
     "/control",
     tokenValidation([process.env.SUPER_USER, "user"]),
     async (req, res) => {
-      res.send("all okay");
+      res.status(200).json({
+        error: null,
+        message: "Valid user",
+      });
     }
   )
 
