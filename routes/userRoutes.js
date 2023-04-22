@@ -151,7 +151,7 @@ router
           id: user._id,
         },
         process.env.TOKEN_SECRET,
-        { expiresIn: "60s" }
+        { expiresIn: "1d" }
       );
 
       user.tokens = token;
