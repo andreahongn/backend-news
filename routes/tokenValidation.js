@@ -7,6 +7,9 @@ const tokenValidation = (role) => async (req, res, next) => {
   try {
     const token = req.header("authorization").replace("Bearer ", "");
     const verify = jwt.verify(token, process.env.TOKEN_SECRET);
+    if (verify.exp < Date.now() / 1000) {
+      return res.status(401).json({ msg: "Expire Token" });
+    }
 
     const userLogin = await UserModel.findOne({
       _id: verify.id,
