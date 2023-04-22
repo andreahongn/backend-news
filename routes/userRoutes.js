@@ -190,6 +190,13 @@ router
       );
     }
   )
+  .get(
+    "/control",
+    tokenValidation([process.env.SUPER_USER, "user"]),
+    async (req, res) => {
+      res.send("all okay");
+    }
+  )
 
   .put(
     "/edituser/:id",
