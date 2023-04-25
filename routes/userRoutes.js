@@ -7,6 +7,10 @@ const tokenValidation = require("./tokenValidation");
 const jwt = require("jsonwebtoken");
 
 const sendMailer = require("../utils/nodemailer");
+const contactMailer = require("../utils/contactmailer");
+const responseContactMailer = require("../utils/responsecontactmailer");
+const resetPasswordMailer = require("../utils/resetpasswordmailer");
+const crypto = require("crypto");
 
 const {
   nameValidation,
@@ -104,8 +108,8 @@ router
           termsandconditions: body.termsandconditions,
         });
         await newUser.save();
-        await sendMailer(req.body.name, req.body.email);
-        await sendMailer();
+        await sendMailer(body.name, body.email);
+
         newUser.password = body.password;
         res.status(200).json({
           error: null,
@@ -208,17 +212,17 @@ router
     async (req, res) => {
       const { name, username, email } = req.body;
       try {
-        const usuarioAeditar = await UserModel.findOne({ _id: req.params.id });
+        const userExist = await UserModel.findOne({ _id: req.params.id });
         const usuarioEditado = await UserModel.findOneAndUpdate(
           { _id: req.params.id },
           {
             name: name,
             username: username,
             email: email,
-            role: usuarioAeditar.role,
-            password: usuarioAeditar.password,
-            tokens: usuarioAeditar.tokens,
-            favorites: usuarioAeditar.favorites,
+            role: userExist.role,
+            password: userExist.password,
+            tokens: userExist.tokens,
+            favorites: userExist.favorites,
           },
           { new: true }
         );
@@ -270,17 +274,17 @@ router
   .put("/favoritecreate", tokenValidation("user"), async (req, res) => {
     const { favorites } = req.body;
     try {
-      const usuarioAeditar = await UserModel.findOne({ _id: req.query.id });
+      const userExist = await UserModel.findOne({ _id: req.query.id });
 
       const usuarioEditado = await UserModel.findOneAndUpdate(
         { _id: req.query.id },
         {
-          name: usuarioAeditar.name,
-          username: usuarioAeditar.username,
-          email: usuarioAeditar.email,
-          role: usuarioAeditar.role,
-          password: usuarioAeditar.password,
-          tokens: usuarioAeditar.tokens,
+          name: userExist.name,
+          username: userExist.username,
+          email: userExist.email,
+          role: userExist.role,
+          password: userExist.password,
+          tokens: userExist.tokens,
           favorites: favorites,
         },
         { new: true }
@@ -311,5 +315,132 @@ router
         return valorAnterior;
       }, [])
     );
+  })
+  .post(
+    "/contact",
+
+    async (req, res) => {
+      const { name, email, message } = req.body;
+
+      const errorsContact = [];
+
+      const fieldValues = [
+        { name: "name", value: name },
+        { name: "email", value: email },
+        { name: "message", value: message },
+      ];
+
+      const validateField = (value, name) => {
+        let error;
+        if (value.trim() === "") {
+          error = `field  ${name} empty`;
+        } else if (value.trim().length < 3) {
+          error = `The field ${name} must have at least 3 characters`;
+        } else if (name === "name") {
+          if (!/^[a-zA-ZÀ-ÿ\s]{3,30}$/.test(value.trim())) {
+            error = `The field ${name} can only have letter and spaces`;
+          } else {
+            error = true;
+          }
+        } else if (name === "email") {
+          if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(value)) {
+            error = `The field ${name} must be an email`;
+          } else {
+            error = true;
+          }
+        } else {
+          error = true;
+        }
+        return error;
+      };
+      fieldValues.forEach((element) => {
+        if (validateField(element.value, element.name) !== true) {
+          errorsContact.push(validateField(element.value, element.name));
+        }
+      });
+      if (name.trim() === "" && email.trim() === "" && message.trim() === "") {
+        return res.status(400).json({
+          error: true,
+          message: "All the fields are empty",
+        });
+      }
+
+      if (errorsContact.length > 0) {
+        return res.status(400).json({
+          error: true,
+          message: errorsContact.join("; "),
+        });
+      }
+
+      try {
+        await contactMailer(name, email, message);
+        await responseContactMailer(name, email);
+
+        res.status(200).json({ messaje: "mail sended" });
+      } catch (error) {
+        res.status(404).json({
+          error: true,
+          message: error,
+        });
+      }
+    }
+  )
+  .put("/resetpassword", async (req, res) => {
+    const email = req.body.email;
+
+    const userExist = await UserModel.findOne({ email });
+
+    if (email.trim() === "") {
+      return res.status(400).json({
+        error: true,
+        message: "Debe poner un email",
+      });
+    }
+
+    if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(email)) {
+      return res.status(400).json({
+        error: true,
+        message: "No es un email valido",
+      });
+    }
+
+    if (!userExist) {
+      return res.status(400).json({
+        error: true,
+        message: "No estas registrado",
+      });
+    }
+    try {
+      const randomBytes = crypto.randomBytes(8);
+      const randomString = randomBytes.toString("hex");
+
+      const newPassword = randomString + "ROLLLING@96";
+
+      const salt = await bcrypt.genSalt();
+      const cryptPassword = await bcrypt.hash(newPassword, salt);
+
+      const usuarioEditado = await UserModel.findOneAndUpdate(
+        { _id: userExist.id },
+        {
+          name: userExist.name,
+          username: userExist.username,
+          email: userExist.email,
+          role: userExist.role,
+          password: cryptPassword,
+          tokens: userExist.tokens,
+          favorites: userExist.favorites,
+        },
+        { new: true }
+      );
+
+      await resetPasswordMailer(userExist.name, email, newPassword);
+      res.status(200).json({ messaje: "password reseted correctly" });
+    } catch (error) {
+      console.log(error);
+      res.status(404).json({
+        error: true,
+        message: error,
+      });
+    }
   });
 module.exports = router;
