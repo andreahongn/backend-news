@@ -156,6 +156,22 @@ router
           error = `field  ${name} empty`;
         } else if (value.trim().length < 3) {
           error = `The field ${name} must have at least 3 characters`;
+        } else if (name === "image") {
+          if (
+            !value
+              .trim()
+              .split(".")
+              .some(
+                (elem) =>
+                  elem.toLowerCase() === "png" ||
+                  elem.toLowerCase() === "jpg" ||
+                  elem.toLowerCase() === "jpeg"
+              )
+          ) {
+            error = "La imagen debe ser formato png o jpg o jpeg";
+          } else {
+            error = true;
+          }
         } else {
           error = true;
         }
