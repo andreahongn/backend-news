@@ -157,17 +157,10 @@ router
         } else if (value.trim().length < 3) {
           error = `The field ${name} must have at least 3 characters`;
         } else if (name === "image") {
-          if (
-            !value
-              .trim()
-              .split(".")
-              .some(
-                (elem) =>
-                  elem.toLowerCase() === "png" ||
-                  elem.toLowerCase() === "jpg" ||
-                  elem.toLowerCase() === "jpeg"
-              )
-          ) {
+          const image = value.trim().split(".")[
+            value.trim().split(".").length - 1
+          ];
+          if (!(image === "png" || image === "jpg" || image === "jpeg")) {
             error = "La imagen debe ser formato png o jpg o jpeg";
           } else {
             error = true;
