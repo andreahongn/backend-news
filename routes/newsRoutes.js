@@ -87,7 +87,7 @@ router
     }
     try {
       const news1 = new NewsModel(req.body);
-      news1.save();
+      await news1.save();
       res.status(200).json({ msg: "new created" });
     } catch (error) {
       res.status(500).json({ msg: "ERROR", error });
