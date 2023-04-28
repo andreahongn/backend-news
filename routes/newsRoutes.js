@@ -14,26 +14,83 @@ router
       title,
       img_URL,
       description,
-      date,
       category,
       author,
       content,
       highlight,
-      avatar_URL,
     } = req.body;
-    const existsNews = await NewsModel.findOne({ title: req.body.title });
+
+    const errorsNews = [];
+
+    const fieldValues = [
+      { name: "title", value: title },
+      { name: "description", value: description },
+      { name: "author", value: author },
+      { name: "content", value: content },
+      { name: "image", value: img_URL },
+      { name: "category", value: category },
+    ];
+
+    const validateField = (value, name) => {
+      let error;
+      if (value.trim() === "") {
+        error = `field  ${name} empty`;
+      } else if (value.trim().length < 3) {
+        error = `The field ${name} must have at least 3 characters`;
+      } else if (name === "image") {
+        const image = value.trim().split(".")[
+          value.trim().split(".").length - 1
+        ];
+        if (!(image === "png" || image === "jpg" || image === "jpeg")) {
+          error = "La imagen debe ser formato png o jpg o jpeg";
+        } else {
+          error = true;
+        }
+      } else {
+        error = true;
+      }
+      return error;
+    };
+
+    fieldValues.forEach((element) => {
+      if (validateField(element.value, element.name) !== true) {
+        errorsNews.push(validateField(element.value, element.name));
+      }
+    });
+
+    if (
+      (title.trim() === "",
+      category.trim() === "",
+      description.trim() === "",
+      content.trim() === "",
+      author.trim() === "",
+      img_URL.trim() === "")
+    ) {
+      return res.status(400).json({
+        error: true,
+        message: "All the fields are empty",
+      });
+    }
+
+    if (errorsNews.length > 0) {
+      return res.status(400).json({
+        error: true,
+        message: errorsNews.join("; "),
+      });
+    }
+
+    const existsNews = await NewsModel.findOne({ title: title });
     console.log("existsNews", existsNews);
 
     if (existsNews) {
-      res.status(400).json({ msg: "noticia duplicada" });
+      res.status(400).json({ msg: "this new alredy exist" });
     }
     try {
       const news1 = new NewsModel(req.body);
-      news1.save();
-      res.send("ok");
+
+      res.status(200).json({ msg: "new created correctly" });
     } catch (error) {
       res.status(500).json({ msg: "ERROR", error });
-      console.log("loadRoute", error);
     }
   })
 
