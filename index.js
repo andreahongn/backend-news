@@ -16,6 +16,10 @@ app.use(cors());
 const routes = require("./routes");
 app.use("/", routes);
 
+app.use((req, res) => {
+  res.status(404).send("Page not found");
+});
+
 app.listen(3001, () => {
   console.log("Server encendido en puerto 3001");
 });

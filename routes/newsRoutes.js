@@ -80,7 +80,6 @@ router
     }
 
     const existsNews = await NewsModel.findOne({ title: title });
-    console.log("existsNews", existsNews);
 
     if (existsNews) {
       res.status(400).json({ msg: "this new alredy exist" });
