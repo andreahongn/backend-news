@@ -243,6 +243,28 @@ router
           message: errorsNews.join("; "),
         });
       }
+      const allHighlights = await NewsModel.find({ highlight: true });
+      const toModify = await NewsModel.findOne({ _id: req.params.id });
+      const allNewsWithoutOne = await NewsModel.find({
+        _id: { $ne: req.params.id },
+      });
+
+      if (
+        allHighlights.length === 3 &&
+        body.highlight === true &&
+        toModify.highlight === false
+      ) {
+        return res
+          .status(400)
+          .json({ error: true, msg: "Solo puede haber 3 destacados" });
+      }
+
+      if (
+        allNewsWithoutOne.filter((element) => element.title === body.title)
+          .length > 0
+      ) {
+        return res.status(400).json({ error: true, msg: "Noticia existente" });
+      }
 
       try {
         const noticiaEditada = await NewsModel.findOneAndUpdate(
