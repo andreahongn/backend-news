@@ -37,18 +37,7 @@ router
         error = `field  ${name} empty`;
       } else if (value.trim().length < 3) {
         error = `The field ${name} must have at least 3 characters`;
-      }
-      // else if (name === "image") {
-      //   const image = value.trim().split(".")[
-      //     value.trim().split(".").length - 1
-      //   ];
-      //   if (!(image === "png" || image === "jpg" || image === "jpeg")) {
-      //     error = "La imagen debe ser formato png o jpg o jpeg";
-      //   } else {
-      //     error = true;
-      //   }
-      // }
-      else {
+      } else {
         error = true;
       }
       return error;
@@ -214,15 +203,6 @@ router
           error = `field  ${name} empty`;
         } else if (value.trim().length < 3) {
           error = `The field ${name} must have at least 3 characters`;
-          // } else if (name === "image") {
-          //   const image = value.trim().split(".")[
-          //     value.trim().split(".").length - 1
-          //   ];
-          //   if (!(image === "png" || image === "jpg" || image === "jpeg")) {
-          //     error = "La imagen debe ser formato png o jpg o jpeg";
-          //   } else {
-          //     error = true;
-          //   }
         } else {
           error = true;
         }

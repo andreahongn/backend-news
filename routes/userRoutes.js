@@ -46,12 +46,6 @@ router
       const newUserMailExist = await UserModel.findOne({
         email: body.email,
       });
-      if (newUserNameExist || newUserMailExist) {
-        return res.status(400).json({
-          error: true,
-          message: "User or email already EXISTS",
-        });
-      }
 
       const usernameValidation = () => {
         if (!/^[a-zA-ZÀ-ÿ]{1}$/i.test(body.username.trim().charAt(0))) {
@@ -92,6 +86,12 @@ router
         return res.status(400).json({
           error: true,
           message: "You must accept the terms and conditions",
+        });
+      }
+      if (newUserNameExist || newUserMailExist) {
+        return res.status(400).json({
+          error: true,
+          message: "usuario o email ya existentes",
         });
       }
 
@@ -209,8 +209,50 @@ router
   .put(
     "/edituser/:id",
     tokenValidation(process.env.SUPER_USER),
+    nameValidation(),
+    emailValidation(),
+    usernameValidation(),
+    validation,
     async (req, res) => {
       const { name, username, email } = req.body;
+
+      const allUserWithoutOne = await UserModel.find({
+        _id: { $ne: req.params.id },
+      });
+      const usernameValidation = () => {
+        if (!/^[a-zA-ZÀ-ÿ]{1}$/i.test(username.trim().charAt(0))) {
+          return "the user name first character must be a letter";
+        } else if (
+          !/^[a-zA-ZÀ-ÿ\s0-9-_]{2,30}$/i.test(
+            username.trim().slice(1, username.trim().length)
+          )
+        ) {
+          return "the user can only have keyboard scripts as symbols";
+        } else if (!/^[\S]{3,30}$/i.test(username.trim())) {
+          return "the user must not have spaces ";
+        } else {
+          return null;
+        }
+      };
+
+      if (usernameValidation()) {
+        return res.status(400).json({
+          error: true,
+          message: usernameValidation(),
+        });
+      }
+
+      if (
+        allUserWithoutOne.filter((element) => element.username === username)
+          .length > 0 ||
+        allUserWithoutOne.filter(
+          (element) => element.email.toLowerCase() === email.toLowerCase()
+        ).length > 0
+      ) {
+        return res.status(400).json({
+          msg: "usuario o email existentes",
+        });
+      }
       try {
         const userExist = await UserModel.findOne({ _id: req.params.id });
         const usuarioEditado = await UserModel.findOneAndUpdate(
@@ -263,7 +305,6 @@ router
         });
         res.status(200).json(deletedUser);
       } catch (error) {
-        console.log(error);
         res.status(404).json({
           error: true,
           message: error,
