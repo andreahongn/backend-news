@@ -72,8 +72,16 @@ router
 
     const existsNews = await NewsModel.findOne({ title: title });
 
+    const allHighlights = await NewsModel.find({ highlight: true });
+
     if (existsNews) {
-      res.status(400).json({ msg: "this new alredy exist" });
+      return res.status(400).json({ error: true, msg: "Noticia existente" });
+    }
+
+    if (allHighlights.length === 3 && highlight === true) {
+      return res
+        .status(400)
+        .json({ error: true, msg: "Solo puede haber 3 destacados" });
     }
     try {
       const news1 = new NewsModel(req.body);

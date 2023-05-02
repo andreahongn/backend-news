@@ -245,9 +245,8 @@ router
       if (
         allUserWithoutOne.filter((element) => element.username === username)
           .length > 0 ||
-        allUserWithoutOne.filter(
-          (element) => element.email.toLowerCase() === email.toLowerCase()
-        ).length > 0
+        allUserWithoutOne.filter((element) => element.email === email).length >
+          0
       ) {
         return res.status(400).json({
           msg: "usuario o email existentes",
